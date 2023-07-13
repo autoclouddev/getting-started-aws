@@ -1,0 +1,16 @@
+# VCS assets
+.git/
+.gitignore
+
+# IDE assets
+.editorconfig
+*.workspace
+
+# Standard text files
+LICENSE
+README*
+
+# Sensitive files
+sensitive.auto.tfvars
+.env
+.vault

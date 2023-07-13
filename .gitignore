@@ -1,0 +1,31 @@
+# OS Cruft
+.DS_Store
+.swp*
+
+# Environment files
+.env
+!.env.example
+
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+**/*.tfstate
+**/*.tfstate.*
+
+# Module lock files
+**/.terraform.lock.hcl
+
+# Crash log files
+crash.log
+
+# Ignore any .tfvars files that are generated automatically for each Terraform run. Most
+# .tfvars files are managed as part of configuration and so should be included in
+# version control.
+**/sensitive.auto.tfvars
+**/!sensitive.auto.tfvars.example
+
+# Prevent anything not kms encrypted in sensitive folders from being committed (Terraform Cloud doesn't support git-crypt yet)
+**/sensitive/*
+!**/sensitive/*.kms*
+!**/sensitive/*.sops*
