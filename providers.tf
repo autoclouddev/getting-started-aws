@@ -19,7 +19,7 @@ provider "autocloud" {
   #
   # https://app.autocloud.io/settings/integrations/terraform-provider
   #
-  # Value must be set eithe via environment variable:
+  # Value must be set either via environment variable:
   #
   # export AUTOCLOUD_TOKEN=
   #
@@ -33,5 +33,6 @@ provider "autocloud" {
 provider "aws" {
   # By default, the AWS provider will use whatever authentication mechanism is configured in your shell environment.
   # See the offical AWS provider documentation for details on how to configure AWS access for Terraform:
+  #
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs#authentication-and-configuration
 }
