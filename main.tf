@@ -2,6 +2,7 @@
 ## GITHUB REPOSITORY CONFIGURATION
 ## Define which Github repositories the Terraform blueprint user has access to
 ## --------------------------------------------------------------------------------------------------------------------
+
 data "autocloud_github_repos" "repos" {}
 
 locals {
@@ -25,12 +26,13 @@ locals {
   ]
 }
 
+
+
 ## --------------------------------------------------------------------------------------------------------------------
 ## GLOBAL BLUEPRINT CONFIGURATION
 ## Define form questions the user will be shown which are either not associated with any Terraform module, or are shared
 ## between multiple Terraform modules.
 ## --------------------------------------------------------------------------------------------------------------------
-
 
 data "autocloud_blueprint_config" "global" {
   ###
@@ -389,17 +391,19 @@ data "autocloud_blueprint_config" "complete" {
 
 
 
-####
-# Create Blueprint
-#
-# Create generator blueprint that contains all the elements
+## --------------------------------------------------------------------------------------------------------------------
+## AUTOCLOUD BLUEPRINT
+## Create the AutoCloud Terraform blueprint using the modules and blueprint configurations defined above. 
+## --------------------------------------------------------------------------------------------------------------------
+
 resource "autocloud_blueprint" "this" {
   name = "[Getting Started] KMS Encrypted S3 Bucket"
 
   ###
   # UI Configuration
-  author       = "jim@unstyl.com" # Set to your user
-  description  = "Deploys a KMS Encrypted S3 Bucket to AWS"
+  #
+  author       = "example@example.com"
+  description  = "Deploy an S3 bucket encrypted with a customer managed KMS key"
   instructions = <<-EOT
     To deploy this generator, these simple steps:
 
