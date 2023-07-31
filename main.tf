@@ -90,7 +90,16 @@ data "autocloud_blueprint_config" "global" {
       error_message = "You must provide a name for the encrypted S3 bucket"
     }
   }
+}
 
+
+## --------------------------------------------------------------------------------------------------------------------
+## AWS CONFIGURATION
+## Define AWS specific elements that will be added to all assets, such as tags and tags
+## between multiple Terraform modules.
+## --------------------------------------------------------------------------------------------------------------------
+
+data "autocloud_blueprint_config" "aws" {
   ###
   # Collect tags to apply to assets
   variable {
@@ -118,36 +127,38 @@ resource "autocloud_module" "kms_key" {
 data "autocloud_blueprint_config" "kms_key" {
   source = {
     global = data.autocloud_blueprint_config.global.blueprint_config,
+    aws    = data.autocloud_blueprint_config.aws.blueprint_config,
     kms    = autocloud_module.kms_key.blueprint_config
   }
 
   ###
   # Hide variables from user
   omit_variables = [
-    # Global
-    "environment",
-    "name",
-    "namespace",
-    "tags",
-
     # Use defaults in the module (don't collect)
-    "alias",
-    "customer_master_key_spec",
-    "key_usage",
-    "multi_region",
-    "policy",
-
-    # Defined below
-    "deletion_window_in_days",
-    "description",
-    "enable_key_rotation",
+    "kms_key.variables.customer_master_key_spec",
+    "kms_key.variables.key_usage",
+    "kms_key.variables.multi_region",
+    "kms_key.variables.policy",
   ]
+
+  ###
+  # Show the full KMS key alias to the user
+  variable {
+    name         = "kms.variables.alias"
+    display_name = "Key Alias"
+    helper_text  = "The alias for the KMS key that will be created"
+    value        = "alias/{{namespace}}-{{environment}}-{{name}}"
+    variables = {
+      namespace   = "global.variables.namespace"
+      environment = "global.variables.environment"
+      name        = "global.variables.name"
+    }
+  }
 
   ###
   # Force KMS key deletion window to 14 days
   variable {
-    name = "kms.variables.deletion_window_in_days"
-
+    name  = "kms.variables.deletion_window_in_days"
     value = 14
   }
 
@@ -161,6 +172,34 @@ data "autocloud_blueprint_config" "kms_key" {
       environment = "global.variables.environment",
       name        = "global.variables.name",
     }
+  }
+
+  ###
+  # Set the environment
+  variable {
+    name  = "kms.variables.environment"
+    value = "global.variables.environment"
+  }
+
+  ###
+  # Set the name
+  variable {
+    name  = "kms.variables.name"
+    value = "global.variables.name"
+  }
+
+  ###
+  # Set the namespace
+  variable {
+    name  = "kms.variables.namespace"
+    value = "global.variables.namespace"
+  }
+
+  ###
+  # Set the tags
+  variable {
+    name  = "kms.variables.tags"
+    value = "aws.variables.tags"
   }
 }
 
@@ -185,60 +224,36 @@ data "autocloud_blueprint_config" "s3_bucket" {
   ###
   # Hide variables from user
   omit_variables = [
-    # Global
-    "environment",
-    "name",
-    "namespace",
-    "tags",
-
     # Use defaults in the module (don't collect)
-    "access_key_enabled",
-    "acl",
-    "allow_encrypted_uploads_only",
-    "allow_ssl_requests_only",
-    "allowed_bucket_actions",
-    "block_public_acls",
-    "block_public_policy",
-    "bucket_key_enabled",
-    "bucket_name",
-    "cors_configuration",
-    "force_destroy",
-    "grants",
-    "ignore_public_acls",
-    "kms_master_key_arn",
-    "lifecycle_configuration_rules",
-    "lifecycle_rule_ids",
-    "lifecycle_rules",
-    "logging",
-    "object_lock_configuration",
-    "policy",
-    "privileged_principal_actions",
-    "privileged_principal_arns",
-    "replication_rules",
-    "restrict_public_buckets",
-    "s3_object_ownership",
-    "s3_replica_bucket_arn",
-    "s3_replication_enabled",
-    "s3_replication_permissions_boundary_arn",
-    "s3_replication_rules",
-    "s3_replication_source_roles",
-    "source_policy_documents",
-    "sse_algorithm",
-    "ssm_base_path",
-    "store_access_key_in_ssm",
-    "transfer_acceleration_enabled",
-    "user_enabled",
-    "user_permissions_boundary_arn",
-    "versioning_enabled",
-    "website_configuration",
-    "website_redirect_all_requests_to",
-
-    # Defined below
-    "allow_encrypted_uploads_only",
-    "allow_ssl_requests_only",
-    "kms_master_key_arn",
-    "s3_object_ownership",
-    "sse_algorithm",
+    "s3.variables.access_key_enabled",
+    "s3.variables.acl",
+    "s3.variables.allowed_bucket_actions",
+    "s3.variables.bucket_key_enabled",
+    "s3.variables.cors_configuration",
+    "s3.variables.force_destroy",
+    "s3.variables.grants",
+    "s3.variables.lifecycle_configuration_rules",
+    "s3.variables.lifecycle_rule_ids",
+    "s3.variables.lifecycle_rules",
+    "s3.variables.logging",
+    "s3.variables.object_lock_configuration",
+    "s3.variables.policy",
+    "s3.variables.privileged_principal_actions",
+    "s3.variables.privileged_principal_arns",
+    "s3.variables.replication_rules",
+    "s3.variables.s3_replica_bucket_arn",
+    "s3.variables.s3_replication_enabled",
+    "s3.variables.s3_replication_permissions_boundary_arn",
+    "s3.variables.s3_replication_rules",
+    "s3.variables.s3_replication_source_roles",
+    "s3.variables.source_policy_documents",
+    "s3.variables.ssm_base_path",
+    "s3.variables.store_access_key_in_ssm",
+    "s3.variables.transfer_acceleration_enabled",
+    "s3.variables.user_enabled",
+    "s3.variables.user_permissions_boundary_arn",
+    "s3.variables.website_configuration",
+    "s3.variables.website_redirect_all_requests_to",
   ]
 
 
@@ -271,6 +286,27 @@ data "autocloud_blueprint_config" "s3_bucket" {
   }
 
   ###
+  # Show the full bucket name to the user
+  variable {
+    name         = "s3.variables.bucket_name"
+    display_name = "S3 Bucket Name"
+    helper_text  = "The full name of the S3 bucket that will be created"
+    value        = "{{namespace}}-{{environment}}-{{name}}"
+    variables = {
+      namespace   = "global.variables.namespace"
+      environment = "global.variables.environment"
+      name        = "global.variables.name"
+    }
+  }
+
+  ###
+  # Set the environment
+  variable {
+    name  = "s3.variables.environment"
+    value = "global.variables.environment"
+  }
+
+  ###
   # Ignore public ACLs
   variable {
     name  = "s3.variables.ignore_public_acls"
@@ -282,6 +318,20 @@ data "autocloud_blueprint_config" "s3_bucket" {
   variable {
     name  = "s3.variables.kms_master_key_arn"
     value = autocloud_module.kms_key.outputs["key_arn"]
+  }
+
+  ###
+  # Set the name
+  variable {
+    name  = "s3.variables.name"
+    value = "global.variables.name"
+  }
+
+  ###
+  # Set the namespace
+  variable {
+    name  = "s3.variables.namespace"
+    value = "global.variables.namespace"
   }
 
   ###
@@ -306,6 +356,13 @@ data "autocloud_blueprint_config" "s3_bucket" {
   }
 
   ###
+  # Set the tags
+  variable {
+    name  = "s3.variables.tags"
+    value = "aws.variables.tags"
+  }
+
+  ###
   # Force versioning
   variable {
     name  = "s3.variables.versioning_enabled"
@@ -324,6 +381,7 @@ data "autocloud_blueprint_config" "s3_bucket" {
 data "autocloud_blueprint_config" "complete" {
   source = {
     global = data.autocloud_blueprint_config.global.blueprint_config,
+    aws    = data.autocloud_blueprint_config.aws.blueprint_config,
     kms    = data.autocloud_blueprint_config.kms_key.blueprint_config,
     s3     = data.autocloud_blueprint_config.s3_bucket.blueprint_config
   }
@@ -356,24 +414,36 @@ data "autocloud_blueprint_config" "complete" {
     # KMS Key
 
     # Defined values, no user input needed
-    "deletion_window_in_days",
-    "description",
-    "enable_key_rotation",
+    "kms.variables.customer_master_key_spec",
+    "kms.variables.key_usage",
+    "kms.variables.multi_region",
+    "kms.variables.policy",
+    "kms.variables.deletion_window_in_days",
+    "kms.variables.description",
+    "kms.variables.enable_key_rotation",
+    "kms.variables.environment",
+    "kms.variables.name",
+    "kms.variables.namespace",
+    "kms.variables.tags",
 
     ###
     # S3 Bucket
 
     # Defined values, no user input needed
-    "allow_encrypted_uploads_only",
-    "allow_ssl_requests_only",
-    "block_public_acls",
-    "block_public_policy",
-    "ignore_public_acls",
-    "kms_master_key_arn",
-    "restrict_public_buckets",
-    "s3_object_ownership",
-    "sse_algorithm",
-    "versioning_enabled",
+    "s3.variables.allow_encrypted_uploads_only",
+    "s3.variables.allow_ssl_requests_only",
+    "s3.variables.block_public_acls",
+    "s3.variables.block_public_policy",
+    "s3.variables.environment",
+    "s3.variables.ignore_public_acls",
+    "s3.variables.kms_master_key_arn",
+    "s3.variables.name",
+    "s3.variables.namespace",
+    "s3.variables.restrict_public_buckets",
+    "s3.variables.s3_object_ownership",
+    "s3.variables.sse_algorithm",
+    "s3.variables.tags",
+    "s3.variables.versioning_enabled",
   ]
 
   ###
@@ -384,7 +454,9 @@ data "autocloud_blueprint_config" "complete" {
       "global.variables.namespace",
       "global.variables.environment",
       "global.variables.name",
-      "global.variables.tags",
+      "kms.variables.alias",
+      "s3.variables.bucket_name",
+      "aws.variables.tags",
     ]
   }
 }
