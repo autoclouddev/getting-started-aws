@@ -107,6 +107,7 @@ data "autocloud_blueprint_config" "global" {
 }
 
 
+
 ## --------------------------------------------------------------------------------------------------------------------
 ## AWS CONFIGURATION
 ## Define AWS specific elements that will be added to all assets, such as tags and tags
