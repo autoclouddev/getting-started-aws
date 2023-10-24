@@ -150,10 +150,10 @@ data "autocloud_blueprint_config" "kms_key" {
   # Hide variables from user
   omit_variables = [
     # Use defaults in the module (don't collect)
-    "kms_key.variables.customer_master_key_spec",
-    "kms_key.variables.key_usage",
-    "kms_key.variables.multi_region",
-    "kms_key.variables.policy",
+    "kms.variables.customer_master_key_spec",
+    "kms.variables.key_usage",
+    "kms.variables.multi_region",
+    "kms.variables.policy",
   ]
 
   ###
@@ -429,10 +429,6 @@ data "autocloud_blueprint_config" "complete" {
     # KMS Key
 
     # Defined values, no user input needed
-    "kms.variables.customer_master_key_spec",
-    "kms.variables.key_usage",
-    "kms.variables.multi_region",
-    "kms.variables.policy",
     "kms.variables.deletion_window_in_days",
     "kms.variables.description",
     "kms.variables.enable_key_rotation",
