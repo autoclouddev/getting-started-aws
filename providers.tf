@@ -17,7 +17,7 @@ provider "autocloud" {
   #
   # Authorizes user to interact with AutoCloud API. These must be generated here:
   #
-  # https://app.autocloud.io/settings/integrations/terraform-provider
+  # https://app.autocloud.io/settings/organization/service-accounts
   #
   # Value must be set either via environment variable:
   #
